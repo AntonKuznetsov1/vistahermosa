@@ -3,7 +3,8 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
-import { Menu, X, Sparkles } from "lucide-react";
+import { Menu, X } from "lucide-react";
+import Butterfly from "@/components/Butterfly";
 
 export default function Nav() {
   const [isOpen, setIsOpen] = useState(false);
@@ -46,7 +47,7 @@ export default function Nav() {
       <nav className="container-wide nav" aria-label="Primary">
         <Link href="/" className="logo" aria-label="Vista Hermosa home" onClick={closeMenu}>
           <span className="logo-mark" aria-hidden="true">
-            <Sparkles className="h-5 w-5" />
+            <Butterfly className="h-5 w-5" />
           </span>
           <span>Vista Hermosa</span>
         </Link>

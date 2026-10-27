@@ -300,7 +300,7 @@ a:hover .arrow,
 }
 
 .logo:hover .logo-mark {
-  transform: rotate(180deg);
+  transform: rotate(-10deg) scale(1.06);
 }
 
 .nav-links {
@@ -440,6 +440,8 @@ a:hover .arrow,
 .hero-title .line {
   display: block;
   overflow: hidden;
+  padding-bottom: 0.28em;
+  margin-bottom: -0.28em;
 }
 
 .hero-title .line > span {

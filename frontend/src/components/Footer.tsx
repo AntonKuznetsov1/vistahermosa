@@ -1,7 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { Mail, Phone, MapPin, Sparkles } from "lucide-react";
+import { Mail, Phone, MapPin } from "lucide-react";
+import Butterfly from "@/components/Butterfly";
 
 export default function Footer() {
   const year = new Date().getFullYear();
@@ -15,7 +16,7 @@ export default function Footer() {
           <div>
             <div className="footer-brand">
               <span className="logo-mark" aria-hidden="true">
-                <Sparkles className="h-5 w-5" />
+                <Butterfly className="h-5 w-5" />
               </span>
               <span>Vista Hermosa</span>
             </div>

@@ -3,6 +3,7 @@ import Footer from "@/components/Footer";
 import SalonArt from "@/components/SalonArt";
 import Link from "next/link";
 import { Sparkles, Scissors, Heart, Mail, Phone, MapPin } from "lucide-react";
+import Butterfly from "@/components/Butterfly";
 
 const services = [
   {
@@ -72,7 +73,7 @@ export default function Home() {
               <span>
                 meets{" "}
                 <span className="pill-word" aria-hidden="true">
-                  <Sparkles />
+                  <Butterfly />
                 </span>{" "}
                 <em>elegance.</em>
               </span>

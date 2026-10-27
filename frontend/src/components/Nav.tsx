@@ -14,7 +14,7 @@ export default function Nav() {
         <div className="flex items-center justify-between h-20">
           <Link href="/" className="flex items-center gap-2 group">
             <Sparkles className="h-8 w-8 group-hover:rotate-12 transition-transform" />
-            <span className="text-2xl font-bold tracking-tight" style={{ fontFamily: 'var(--font-display)' }}>
+            <span className="text-2xl font-bold tracking-tight" style={{ letterSpacing: '-0.03em' }}>
               Vista Hermosa
             </span>
           </Link>

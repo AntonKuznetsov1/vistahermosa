@@ -13,30 +13,33 @@ export default function Home() {
       <section className="py-20 md:py-32">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-4xl mx-auto text-center">
-            <div className="flex justify-center mb-6">
+            <div className="flex justify-center mb-6 reveal">
               <Sparkles className="h-16 w-16" />
             </div>
-            <h1 className="text-5xl md:text-7xl lg:text-8xl font-bold mb-6 tracking-tight" style={{ fontFamily: 'var(--font-display)' }}>
+            <h1 className="text-5xl md:text-7xl lg:text-8xl font-bold mb-6 tracking-tight reveal" style={{ letterSpacing: '-0.05em' }}>
               Vista Hermosa
               <br />
               <span className="text-4xl md:text-6xl lg:text-7xl">Beauty Salon</span>
             </h1>
-            <p className="text-xl md:text-2xl mb-8 text-gray-700">
+            <p className="text-xl md:text-2xl mb-8 text-gray-700 reveal">
               Where beauty meets elegance in the heart of Michoacan
             </p>
-            <Link href="/booking">
-              <Button size="lg" className="rounded-full text-lg px-8 py-6">
-                Book Your Appointment
-              </Button>
-            </Link>
+            <div className="reveal">
+              <Link href="/booking">
+                <Button size="lg" className="rounded-full text-lg px-8 py-6">
+                  Book Your Appointment
+                </Button>
+              </Link>
+            </div>
           </div>
         </div>
       </section>
 
       <section id="services" className="py-20 bg-white/50">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <h2 className="text-4xl md:text-5xl font-bold mb-4" style={{ fontFamily: 'var(--font-display)' }}>
+          <div className="text-center mb-12 reveal">
+            <span className="label">What we offer</span>
+            <h2 className="text-4xl md:text-5xl font-bold mb-4" style={{ letterSpacing: '-0.04em' }}>
               Our Services
             </h2>
             <p className="text-lg text-gray-700">
@@ -45,7 +48,7 @@ export default function Home() {
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
-            <Card className="hover:shadow-lg transition-shadow">
+            <Card className="hover:shadow-lg transition-shadow reveal">
               <CardHeader>
                 <Scissors className="h-10 w-10 mb-2" />
                 <CardTitle>Hair Services</CardTitle>
@@ -53,7 +56,7 @@ export default function Home() {
               </CardHeader>
             </Card>
             
-            <Card className="hover:shadow-lg transition-shadow">
+            <Card className="hover:shadow-lg transition-shadow reveal">
               <CardHeader>
                 <Heart className="h-10 w-10 mb-2" />
                 <CardTitle>Beauty & Skincare</CardTitle>
@@ -61,7 +64,7 @@ export default function Home() {
               </CardHeader>
             </Card>
             
-            <Card className="hover:shadow-lg transition-shadow">
+            <Card className="hover:shadow-lg transition-shadow reveal">
               <CardHeader>
                 <Sparkles className="h-10 w-10 mb-2" />
                 <CardTitle>Nail Care</CardTitle>
@@ -70,7 +73,7 @@ export default function Home() {
             </Card>
           </div>
           
-          <div className="text-center mt-10">
+          <div className="text-center mt-10 reveal">
             <Link href="/booking">
               <Button variant="outline" size="lg" className="rounded-full">
                 View All Services & Book
@@ -82,8 +85,9 @@ export default function Home() {
 
       <section id="contact" className="py-20">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <h2 className="text-4xl md:text-5xl font-bold mb-4" style={{ fontFamily: 'var(--font-display)' }}>
+          <div className="text-center mb-12 reveal">
+            <span className="label">Get in touch</span>
+            <h2 className="text-4xl md:text-5xl font-bold mb-4" style={{ letterSpacing: '-0.04em' }}>
               Get In Touch
             </h2>
             <p className="text-lg text-gray-700">
@@ -91,7 +95,7 @@ export default function Home() {
             </p>
           </div>
           
-          <div className="max-w-2xl mx-auto">
+          <div className="max-w-2xl mx-auto reveal">
             <Card>
               <CardContent className="pt-6 space-y-4">
                 <div className="flex items-center gap-3">

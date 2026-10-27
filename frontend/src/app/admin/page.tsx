@@ -231,9 +231,12 @@ export default function AdminPage() {
   return (
     <div className="min-h-screen bg-background">
       <div className="container mx-auto px-4 py-8">
-        <h1 className="text-4xl font-bold mb-8" style={{ fontFamily: 'var(--font-display)' }}>
-          Admin Panel
-        </h1>
+        <div className="mb-8 reveal">
+          <span className="label">Dashboard</span>
+          <h1 className="text-4xl font-bold mb-2" style={{ letterSpacing: '-0.04em' }}>
+            Admin Panel
+          </h1>
+        </div>
         
         <div className="flex gap-2 mb-6 flex-wrap">
           <Button variant={activeTab === "services" ? "default" : "outline"} onClick={() => setActiveTab("services")}>

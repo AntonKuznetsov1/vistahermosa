@@ -80,9 +80,12 @@ export default function BlogPage() {
       
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="max-w-4xl mx-auto">
-          <h1 className="text-4xl md:text-5xl font-bold mb-8 text-center" style={{ fontFamily: 'var(--font-display)' }}>
-            Our Blog
-          </h1>
+          <div className="text-center mb-10 reveal">
+            <span className="label">Journal</span>
+            <h1 className="text-4xl md:text-5xl font-bold mb-2 text-center" style={{ letterSpacing: '-0.04em' }}>
+              Our Blog
+            </h1>
+          </div>
           
           <div className="space-y-8">
             {posts.map((post) => (

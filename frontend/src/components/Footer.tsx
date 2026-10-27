@@ -19,7 +19,7 @@ export default function Footer() {
           <div>
             <div className="flex items-center gap-2 mb-4">
               <Sparkles className="h-6 w-6" />
-              <span className="text-xl font-bold" style={{ fontFamily: 'var(--font-display)' }}>
+              <span className="text-xl font-bold" style={{ letterSpacing: '-0.03em' }}>
                 Vista Hermosa Beauty Salon
               </span>
             </div>

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Inter, Syne } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "sonner";
+import ScrollReveal from "@/components/ScrollReveal";
 
 const inter = Inter({
   variable: "--font-sans",
@@ -30,6 +31,7 @@ export default function RootLayout({
         className={`${inter.variable} ${syne.variable} antialiased`}
       >
         {children}
+        <ScrollReveal />
         <Toaster position="top-center" />
       </body>
     </html>

@@ -115,11 +115,14 @@ export default function BookingPage() {
       
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="max-w-3xl mx-auto">
-          <h1 className="text-4xl md:text-5xl font-bold mb-8 text-center" style={{ fontFamily: 'var(--font-display)' }}>
-            Book an Appointment
-          </h1>
+          <div className="text-center mb-10 reveal">
+            <span className="label">Schedule</span>
+            <h1 className="text-4xl md:text-5xl font-bold mb-2 text-center" style={{ letterSpacing: '-0.04em' }}>
+              Book an Appointment
+            </h1>
+          </div>
           
-          <div className="flex justify-between mb-8">
+          <div className="flex justify-between mb-8 reveal">
             {[1, 2, 3, 4].map((s) => (
               <div key={s} className="flex-1 flex items-center">
                 <div className={`w-10 h-10 rounded-full flex items-center justify-center ${

@@ -1,4 +1,4 @@
-const API_URL = process.env.NEXT_PUBLIC_API_URL;
+const API_URL = process.env.NEXT_PUBLIC_API_URL?.trim().replace(/\/+$/, '');
 
 if (typeof window !== 'undefined' && process.env.NODE_ENV === 'production') {
   if (!API_URL) {
@@ -9,7 +9,9 @@ if (typeof window !== 'undefined' && process.env.NODE_ENV === 'production') {
 }
 
 export async function fetchAPI(endpoint: string, options: RequestInit = {}) {
-  const baseUrl = API_URL || (process.env.NODE_ENV === 'development' ? 'http://localhost:5000' : '');
+  const baseUrl = (
+    API_URL || (process.env.NODE_ENV === 'development' ? 'http://localhost:5000' : '')
+  ).replace(/\/+$/, '');
   
   if (!baseUrl) {
     throw new Error('API URL not configured');

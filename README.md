@@ -70,6 +70,7 @@ npm run dev
 - **Backend**: Deploy to Render from the `backend` directory (use Procfile)
 - **Database**: Supabase (create tables and blog-images bucket)
 - **Uptime**: Use UptimeRobot to keep backend alive
+- **Environment values**: Do not add trailing slashes to `FRONTEND_URL` or `NEXT_PUBLIC_API_URL`. Multiple allowed frontend origins can be comma-separated in `FRONTEND_URL`.
 
 ## Contact
 - Email: tanglica101@gmail.com

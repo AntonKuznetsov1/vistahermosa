@@ -14,8 +14,19 @@ const email_1 = __importDefault(require("./routes/email"));
 dotenv_1.default.config();
 const app = (0, express_1.default)();
 const PORT = process.env.PORT || 5000;
+const allowedOrigins = (process.env.FRONTEND_URL || '')
+    .split(',')
+    .map((origin) => origin.trim().replace(/\/+$/, ''))
+    .filter(Boolean);
 app.use((0, cors_1.default)({
-    origin: process.env.FRONTEND_URL || '*',
+    origin(origin, callback) {
+        if (!origin || allowedOrigins.length === 0) {
+            callback(null, true);
+            return;
+        }
+        const normalizedOrigin = origin.trim().replace(/\/+$/, '');
+        callback(null, allowedOrigins.includes(normalizedOrigin));
+    },
     credentials: true
 }));
 app.use(express_1.default.json());

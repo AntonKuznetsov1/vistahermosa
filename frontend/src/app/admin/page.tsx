@@ -143,7 +143,7 @@ export default function AdminPage() {
   ]);
 
   const handleLogin = () => {
-    if (password === "Natasha2011") {
+    if (password === "PASSWORD") {
       setIsAuthenticated(true);
       toast.success("Logged in successfully");
     } else {

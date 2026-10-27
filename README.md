@@ -27,7 +27,7 @@ vistahermosa/
 - **Home Page**: Hero section, Services section, Contact section
 - **Booking**: 4-step booking flow (Service → Date → Time Slot → Contact Info)
 - **Blog**: Post listing with like functionality (newest first)
-- **Admin Panel** (password: Natasha2011): Services CRUD, Booking monitoring, Time slot configuration, Blog post management
+- **Admin Panel** (password: PASSWORD): Services CRUD, Booking monitoring, Time slot configuration, Blog post management
 
 ## Setup
 
@@ -59,7 +59,7 @@ npm run dev
 - SUPABASE_SERVICE_ROLE_KEY
 - SMTP_USER (emailsystem95@gmail.com)
 - SMTP_PASS (abqj zpmc kgqt ogoe)
-- ADMIN_PASSWORD (Natasha2011)
+- ADMIN_PASSWORD (PASSWORD)
 
 ### Frontend (.env.local)
 - NEXT_PUBLIC_API_URL

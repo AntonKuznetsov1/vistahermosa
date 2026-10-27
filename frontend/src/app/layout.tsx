@@ -30,6 +30,7 @@ export default function RootLayout({
       <body
         className={`${inter.variable} ${syne.variable} antialiased`}
       >
+        <a className="skip-link" href="#main">Skip to content</a>
         {children}
         <ScrollReveal />
         <Toaster position="top-center" />

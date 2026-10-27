@@ -1,58 +1,62 @@
 "use client";
 
+import Link from "next/link";
 import { Mail, Phone, MapPin, Sparkles } from "lucide-react";
-import { useState, useEffect } from "react";
 
 export default function Footer() {
-  const [year, setYear] = useState(2026);
+  const year = new Date().getFullYear();
   const address = "Vista Hermosa, Michoacan De Ocampo, Mexico";
   const mapUrl = `https://maps.google.com/maps?q=${encodeURIComponent(address)}&t=&z=13&ie=UTF8&iwloc=&output=embed`;
 
-  useEffect(() => {
-    setYear(new Date().getFullYear());
-  }, []);
-
   return (
-    <footer className="bg-black text-white mt-20">
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+    <footer className="site-footer">
+      <div className="container-wide">
+        <div className="footer-grid">
           <div>
-            <div className="flex items-center gap-2 mb-4">
-              <Sparkles className="h-6 w-6" />
-              <span className="text-xl font-bold" style={{ letterSpacing: '-0.03em' }}>
-                Vista Hermosa Beauty Salon
+            <div className="footer-brand">
+              <span className="logo-mark" aria-hidden="true">
+                <Sparkles className="h-5 w-5" />
               </span>
+              <span>Vista Hermosa</span>
             </div>
-            <p className="text-gray-300 mb-4">
-              Your beauty, our passion.
+            <h2>Your beauty,<br />our passion.</h2>
+            <p style={{ color: "#c9c3b6" }}>
+              A beauty salon in the heart of Michoacan, where every appointment
+              is a little moment for you.
             </p>
           </div>
 
           <div>
-            <h3 className="text-lg font-semibold mb-4">Contact Info</h3>
-            <div className="space-y-3">
-              <div className="flex items-center gap-2">
-                <Mail className="h-5 w-5" />
-                <a href="mailto:tanglica101@gmail.com" className="hover:underline">
-                  tanglica101@gmail.com
-                </a>
-              </div>
-              <div className="flex items-center gap-2">
-                <Phone className="h-5 w-5" />
-                <a href="tel:9719989715" className="hover:underline">
-                  971 998 9715
-                </a>
-              </div>
-              <div className="flex items-start gap-2">
-                <MapPin className="h-5 w-5 mt-1 flex-shrink-0" />
+            <h3>Explore</h3>
+            <ul>
+              <li><Link href="/#services">Services</Link></li>
+              <li><Link href="/#contact">Contact</Link></li>
+              <li><Link href="/blog">Journal</Link></li>
+              <li><Link href="/booking">Book Now</Link></li>
+            </ul>
+          </div>
+
+          <div>
+            <h3>Contact Info</h3>
+            <div className="footer-contact">
+              <a href="mailto:tanglica101@gmail.com">
+                <Mail className="h-5 w-5 flex-shrink-0" />
+                <span>tanglica101@gmail.com</span>
+              </a>
+              <a href="tel:9719989715">
+                <Phone className="h-5 w-5 flex-shrink-0" />
+                <span>971 998 9715</span>
+              </a>
+              <div>
+                <MapPin className="h-5 w-5 flex-shrink-0" />
                 <span>{address}</span>
               </div>
             </div>
           </div>
 
           <div>
-            <h3 className="text-lg font-semibold mb-4">Location</h3>
-            <div className="w-full h-48 rounded-lg overflow-hidden">
+            <h3>Location</h3>
+            <div className="footer-map">
               <iframe
                 src={mapUrl}
                 width="100%"
@@ -67,8 +71,14 @@ export default function Footer() {
           </div>
         </div>
 
-        <div className="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400">
-          <p>&copy; {year} Vista Hermosa Beauty Salon. All rights reserved.</p>
+        <div className="footer-word" aria-hidden="true">vista hermosa</div>
+
+        <div className="footer-bottom">
+          <span>&copy; {year} Vista Hermosa Beauty Salon. All rights reserved.</span>
+          <nav aria-label="Footer">
+            <Link href="/booking">Book an appointment</Link>
+            <Link href="/#contact">Get in touch</Link>
+          </nav>
         </div>
       </div>
     </footer>

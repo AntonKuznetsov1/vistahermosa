@@ -1,10 +1,8 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { Fragment, useState, useEffect } from "react";
 import Nav from "@/components/Nav";
 import Footer from "@/components/Footer";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
@@ -42,36 +40,46 @@ export default function BookingPage() {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    fetchServices();
+    let cancelled = false;
+
+    const load = async () => {
+      try {
+        const res = await fetch(`${API_URL}/api/services`);
+        const data = await res.json();
+        if (!cancelled) setServices(data);
+      } catch {
+        if (!cancelled) toast.error("Failed to load services");
+      }
+    };
+
+    load();
+
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   useEffect(() => {
-    if (date) {
-      fetchTimeSlots();
-    }
-  }, [date]);
-
-  const fetchServices = async () => {
-    try {
-      const res = await fetch(`${API_URL}/api/services`);
-      const data = await res.json();
-      setServices(data);
-    } catch (error) {
-      toast.error("Failed to load services");
-    }
-  };
-
-  const fetchTimeSlots = async () => {
     if (!date) return;
-    try {
-      const dateStr = date.toISOString().split('T')[0];
-      const res = await fetch(`${API_URL}/api/time-slots/available/${dateStr}`);
-      const data = await res.json();
-      setTimeSlots(data);
-    } catch (error) {
-      toast.error("Failed to load time slots");
-    }
-  };
+    let cancelled = false;
+
+    const load = async () => {
+      try {
+        const dateStr = date.toISOString().split('T')[0];
+        const res = await fetch(`${API_URL}/api/time-slots/available/${dateStr}`);
+        const data = await res.json();
+        if (!cancelled) setTimeSlots(data);
+      } catch {
+        if (!cancelled) toast.error("Failed to load time slots");
+      }
+    };
+
+    load();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [date]);
 
   const handleSubmit = async () => {
     if (!selectedService || !date || !selectedTime || !formData.name || !formData.email || !formData.phone) {
@@ -102,7 +110,7 @@ export default function BookingPage() {
       } else {
         toast.error("Failed to send booking request");
       }
-    } catch (error) {
+    } catch {
       toast.error("An error occurred");
     } finally {
       setLoading(false);
@@ -112,136 +120,163 @@ export default function BookingPage() {
   return (
     <div className="min-h-screen">
       <Nav />
-      
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="max-w-3xl mx-auto">
-          <div className="text-center mb-10 reveal">
-            <span className="label">Schedule</span>
-            <h1 className="text-4xl md:text-5xl font-bold mb-2 text-center" style={{ letterSpacing: '-0.04em' }}>
-              Book an Appointment
-            </h1>
-          </div>
-          
-          <div className="flex justify-between mb-8 reveal">
-            {[1, 2, 3, 4].map((s) => (
-              <div key={s} className="flex-1 flex items-center">
-                <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
-                  step >= s ? 'bg-black text-white' : 'bg-gray-300'
-                }`}>
-                  {s}
-                </div>
-                {s < 4 && <div className={`flex-1 h-1 ${step > s ? 'bg-black' : 'bg-gray-300'}`} />}
-              </div>
-            ))}
-          </div>
 
-          {step === 1 && (
-            <Card>
-              <CardHeader>
-                <CardTitle>Step 1: Select Service</CardTitle>
-                <CardDescription>Choose the service you'd like</CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                {services.map((service) => (
+      <main id="main">
+        <section className="page-hero container-wide" aria-labelledby="booking-title">
+          <span className="label">Schedule</span>
+          <h1 id="booking-title">Book an appointment</h1>
+          <p>
+            Choose a service, pick a date and time, and leave the rest to us.
+          </p>
+        </section>
+
+        <div className="container-wide pb-24">
+          <div className="booking-layout">
+            <div className="steps reveal" aria-label="Booking progress">
+              {[1, 2, 3, 4].map((s) => (
+                <Fragment key={s}>
                   <div
-                    key={service.id}
-                    onClick={() => setSelectedService(service)}
-                    className={`p-4 border rounded-lg cursor-pointer transition-all ${
-                      selectedService?.id === service.id
-                        ? 'border-black bg-accent'
-                        : 'border-border hover:border-black'
-                    }`}
+                    className={`step-dot${step === s ? " active" : step > s ? " done" : ""}`}
+                    aria-current={step === s ? "step" : undefined}
                   >
-                    <h3 className="font-semibold text-lg">{service.title}</h3>
-                    <p className="text-gray-700">{service.description}</p>
-                    {service.price && (
-                      <p className="mt-2 font-semibold">${service.price}</p>
-                    )}
+                    {s}
                   </div>
-                ))}
-                <Button
-                  onClick={() => setStep(2)}
-                  disabled={!selectedService}
-                  className="w-full mt-4"
-                >
-                  Next
-                </Button>
-              </CardContent>
-            </Card>
-          )}
+                  {s < 4 && (
+                    <div className={`step-bar${step > s ? " done" : ""}`} />
+                  )}
+                </Fragment>
+              ))}
+            </div>
 
-          {step === 2 && (
-            <Card>
-              <CardHeader>
-                <CardTitle>Step 2: Select Date</CardTitle>
-                <CardDescription>Choose your preferred date</CardDescription>
-              </CardHeader>
-              <CardContent className="flex flex-col items-center">
-                <Calendar
-                  mode="single"
-                  selected={date}
-                  onSelect={setDate}
-                  disabled={(date) => date < new Date(new Date().setHours(0,0,0,0))}
-                  className="rounded-md border"
-                />
-                <div className="flex gap-2 mt-4 w-full">
-                  <Button variant="outline" onClick={() => setStep(1)} className="flex-1">
-                    Back
-                  </Button>
-                  <Button onClick={() => setStep(3)} disabled={!date} className="flex-1">
-                    Next
-                  </Button>
+            {step === 1 && (
+              <div className="panel reveal">
+                <div className="panel-head">
+                  <h2>Step 1: Select Service</h2>
+                  <p>Choose the service you&apos;d like</p>
                 </div>
-              </CardContent>
-            </Card>
-          )}
 
-          {step === 3 && (
-            <Card>
-              <CardHeader>
-                <CardTitle>Step 3: Select Time Slot</CardTitle>
-                <CardDescription>Available times for {date?.toDateString()}</CardDescription>
-              </CardHeader>
-              <CardContent>
+                <div className="space-y-3">
+                  {services.map((service) => (
+                    <button
+                      key={service.id}
+                      type="button"
+                      onClick={() => setSelectedService(service)}
+                      className={`service-option${selectedService?.id === service.id ? " selected" : ""}`}
+                    >
+                      <h3>{service.title}</h3>
+                      <p>{service.description}</p>
+                      {service.price && (
+                        <p className="price">${service.price}</p>
+                      )}
+                    </button>
+                  ))}
+
+                  {services.length === 0 && (
+                    <p className="empty-state">Loading services...</p>
+                  )}
+                </div>
+
+                <div className="mt-6">
+                  <button
+                    type="button"
+                    onClick={() => setStep(2)}
+                    disabled={!selectedService}
+                    className="btn btn-dark w-full"
+                  >
+                    Next <span className="arrow">↗</span>
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {step === 2 && (
+              <div className="panel reveal">
+                <div className="panel-head">
+                  <h2>Step 2: Select Date</h2>
+                  <p>Choose your preferred date</p>
+                </div>
+
+                <div className="calendar-shell">
+                  <Calendar
+                    mode="single"
+                    selected={date}
+                    onSelect={setDate}
+                    disabled={(date) => date < new Date(new Date().setHours(0,0,0,0))}
+                  />
+                </div>
+
+                <div className="flex gap-3 mt-6 w-full">
+                  <button
+                    type="button"
+                    onClick={() => setStep(1)}
+                    className="btn btn-line flex-1"
+                  >
+                    Back
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setStep(3)}
+                    disabled={!date}
+                    className="btn btn-dark flex-1"
+                  >
+                    Next <span className="arrow">↗</span>
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {step === 3 && (
+              <div className="panel reveal">
+                <div className="panel-head">
+                  <h2>Step 3: Select Time Slot</h2>
+                  <p>Available times for {date?.toDateString()}</p>
+                </div>
+
                 {timeSlots.length === 0 ? (
-                  <p className="text-center text-gray-600 py-8">No available time slots for this date</p>
+                  <p className="empty-state">No available time slots for this date</p>
                 ) : (
-                  <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+                  <div className="time-grid">
                     {timeSlots.map((slot) => (
-                      <div
+                      <button
                         key={slot.start_time}
+                        type="button"
                         onClick={() => setSelectedTime(slot.start_time)}
-                        className={`p-3 border rounded-lg cursor-pointer text-center transition-all ${
-                          selectedTime === slot.start_time
-                            ? 'border-black bg-accent'
-                            : 'border-border hover:border-black'
-                        }`}
+                        className={`time-slot${selectedTime === slot.start_time ? " selected" : ""}`}
                       >
                         {slot.start_time}
-                      </div>
+                      </button>
                     ))}
                   </div>
                 )}
-                <div className="flex gap-2 mt-4">
-                  <Button variant="outline" onClick={() => setStep(2)} className="flex-1">
-                    Back
-                  </Button>
-                  <Button onClick={() => setStep(4)} disabled={!selectedTime} className="flex-1">
-                    Next
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-          )}
 
-          {step === 4 && (
-            <Card>
-              <CardHeader>
-                <CardTitle>Step 4: Your Information</CardTitle>
-                <CardDescription>Enter your contact details</CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div>
+                <div className="flex gap-3 mt-6">
+                  <button
+                    type="button"
+                    onClick={() => setStep(2)}
+                    className="btn btn-line flex-1"
+                  >
+                    Back
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setStep(4)}
+                    disabled={!selectedTime}
+                    className="btn btn-dark flex-1"
+                  >
+                    Next <span className="arrow">↗</span>
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {step === 4 && (
+              <div className="panel reveal">
+                <div className="panel-head">
+                  <h2>Step 4: Your Information</h2>
+                  <p>Enter your contact details</p>
+                </div>
+
+                <div className="field">
                   <Label htmlFor="name">Full Name *</Label>
                   <Input
                     id="name"
@@ -249,7 +284,8 @@ export default function BookingPage() {
                     onChange={(e) => setFormData({...formData, name: e.target.value})}
                   />
                 </div>
-                <div>
+
+                <div className="field">
                   <Label htmlFor="email">Email *</Label>
                   <Input
                     id="email"
@@ -258,7 +294,8 @@ export default function BookingPage() {
                     onChange={(e) => setFormData({...formData, email: e.target.value})}
                   />
                 </div>
-                <div>
+
+                <div className="field">
                   <Label htmlFor="phone">Phone Number *</Label>
                   <Input
                     id="phone"
@@ -266,7 +303,8 @@ export default function BookingPage() {
                     onChange={(e) => setFormData({...formData, phone: e.target.value})}
                   />
                 </div>
-                <div>
+
+                <div className="field">
                   <Label htmlFor="message">Message (Optional)</Label>
                   <Textarea
                     id="message"
@@ -275,27 +313,36 @@ export default function BookingPage() {
                     placeholder="Describe what you need..."
                   />
                 </div>
-                
-                <div className="bg-accent p-4 rounded-lg space-y-2">
-                  <h4 className="font-semibold">Booking Summary</h4>
+
+                <div className="summary-box">
+                  <h4>Booking Summary</h4>
                   <p><strong>Service:</strong> {selectedService?.title}</p>
                   <p><strong>Date:</strong> {date?.toDateString()}</p>
                   <p><strong>Time:</strong> {selectedTime}</p>
                 </div>
-                
-                <div className="flex gap-2">
-                  <Button variant="outline" onClick={() => setStep(3)} className="flex-1">
+
+                <div className="flex gap-3">
+                  <button
+                    type="button"
+                    onClick={() => setStep(3)}
+                    className="btn btn-line flex-1"
+                  >
                     Back
-                  </Button>
-                  <Button onClick={handleSubmit} disabled={loading} className="flex-1">
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleSubmit}
+                    disabled={loading}
+                    className="btn btn-dark flex-1"
+                  >
                     {loading ? "Sending..." : "Confirm Booking"}
-                  </Button>
+                  </button>
                 </div>
-              </CardContent>
-            </Card>
-          )}
+              </div>
+            )}
+          </div>
         </div>
-      </div>
+      </main>
 
       <Footer />
     </div>

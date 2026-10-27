@@ -1,77 +1,98 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { usePathname } from "next/navigation";
+import { useEffect, useState } from "react";
 import { Menu, X, Sparkles } from "lucide-react";
-import { Button } from "@/components/ui/button";
 
 export default function Nav() {
   const [isOpen, setIsOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+  const pathname = usePathname();
+
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 10);
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  useEffect(() => {
+    document.body.style.overflow = isOpen ? "hidden" : "";
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [isOpen]);
+
+  useEffect(() => {
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setIsOpen(false);
+    };
+    const onResize = () => {
+      if (window.innerWidth > 860) setIsOpen(false);
+    };
+    document.addEventListener("keydown", onKeyDown);
+    window.addEventListener("resize", onResize);
+    return () => {
+      document.removeEventListener("keydown", onKeyDown);
+      window.removeEventListener("resize", onResize);
+    };
+  }, []);
+
+  const closeMenu = () => setIsOpen(false);
 
   return (
-    <nav className="sticky top-0 z-50 bg-background/95 backdrop-blur-sm border-b border-border">
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-20">
-          <Link href="/" className="flex items-center gap-2 group">
-            <Sparkles className="h-8 w-8 group-hover:rotate-12 transition-transform" />
-            <span className="text-2xl font-bold tracking-tight" style={{ letterSpacing: '-0.03em' }}>
-              Vista Hermosa
-            </span>
-          </Link>
+    <header className={`site-header${scrolled ? " scrolled" : ""}`}>
+      <nav className="container-wide nav" aria-label="Primary">
+        <Link href="/" className="logo" aria-label="Vista Hermosa home" onClick={closeMenu}>
+          <span className="logo-mark" aria-hidden="true">
+            <Sparkles className="h-5 w-5" />
+          </span>
+          <span>Vista Hermosa</span>
+        </Link>
 
-          <div className="hidden md:flex items-center gap-6">
-            <Link href="/#services" className="hover:underline transition-all">
+        <button
+          className="menu-toggle"
+          type="button"
+          aria-expanded={isOpen}
+          aria-controls="nav-links"
+          onClick={() => setIsOpen(!isOpen)}
+        >
+          {isOpen ? <X className="h-4 w-4" /> : <Menu className="h-4 w-4" />}
+          <span>{isOpen ? "Close" : "Menu"}</span>
+        </button>
+
+        <ul id="nav-links" className={`nav-links${isOpen ? " open" : ""}`}>
+          <li>
+            <Link href="/#services" onClick={closeMenu}>
               Services
             </Link>
-            <Link href="/#contact" className="hover:underline transition-all">
+          </li>
+          <li>
+            <Link href="/#contact" onClick={closeMenu}>
               Contact
             </Link>
-            <Link href="/blog" className="hover:underline transition-all">
-              Blog
-            </Link>
-            <Link href="/booking">
-              <Button className="rounded-full">Book Now</Button>
-            </Link>
-          </div>
-
-          <button
-            className="md:hidden"
-            onClick={() => setIsOpen(!isOpen)}
-            aria-label="Toggle menu"
-          >
-            {isOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
-          </button>
-        </div>
-
-        {isOpen && (
-          <div className="md:hidden py-4 space-y-4">
-            <Link
-              href="/#services"
-              className="block hover:underline"
-              onClick={() => setIsOpen(false)}
-            >
-              Services
-            </Link>
-            <Link
-              href="/#contact"
-              className="block hover:underline"
-              onClick={() => setIsOpen(false)}
-            >
-              Contact
-            </Link>
+          </li>
+          <li>
             <Link
               href="/blog"
-              className="block hover:underline"
-              onClick={() => setIsOpen(false)}
+              aria-current={pathname === "/blog" ? "page" : undefined}
+              onClick={closeMenu}
             >
-              Blog
+              Journal
             </Link>
-            <Link href="/booking" onClick={() => setIsOpen(false)}>
-              <Button className="w-full rounded-full">Book Now</Button>
+          </li>
+          <li className="nav-cta">
+            <Link
+              href="/booking"
+              aria-current={pathname === "/booking" ? "page" : undefined}
+              onClick={closeMenu}
+            >
+              Book Now
             </Link>
-          </div>
-        )}
-      </div>
-    </nav>
+          </li>
+        </ul>
+      </nav>
+    </header>
   );
 }

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -9,20 +9,56 @@ import { Textarea } from "@/components/ui/textarea";
 import { API_URL } from "@/lib/api";
 import { toast } from "sonner";
 
+interface Service {
+  id: string;
+  title: string;
+  description: string;
+  price: number | null;
+}
+
+interface Booking {
+  id: string;
+  status: string;
+  booking_date: string;
+  start_time: string;
+  client_name: string;
+  client_email: string;
+  client_phone: string;
+  message?: string | null;
+  services?: { title: string } | null;
+}
+
+interface TimeSlot {
+  id: string;
+  type: string;
+  day_of_week: number | null;
+  specific_date: string | null;
+  start_time: string;
+  end_time: string;
+  action: string;
+}
+
+interface BlogPost {
+  id: string;
+  title: string;
+  description: string;
+  created_at: string;
+}
+
 export default function AdminPage() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [password, setPassword] = useState("");
   const [activeTab, setActiveTab] = useState("services");
   
   // Services
-  const [services, setServices] = useState<any[]>([]);
+  const [services, setServices] = useState<Service[]>([]);
   const [serviceForm, setServiceForm] = useState({ title: "", description: "", price: "" });
   
   // Bookings
-  const [bookings, setBookings] = useState<any[]>([]);
+  const [bookings, setBookings] = useState<Booking[]>([]);
   
   // Time slots
-  const [timeSlots, setTimeSlots] = useState<any[]>([]);
+  const [timeSlots, setTimeSlots] = useState<TimeSlot[]>([]);
   const [timeSlotForm, setTimeSlotForm] = useState({
     type: "recurring",
     day_of_week: "0",
@@ -33,22 +69,78 @@ export default function AdminPage() {
   });
   
   // Blog
-  const [posts, setPosts] = useState<any[]>([]);
+  const [posts, setPosts] = useState<BlogPost[]>([]);
   const [blogForm, setBlogForm] = useState({ title: "", description: "" });
   const [blogImage, setBlogImage] = useState<File | null>(null);
 
-  useEffect(() => {
-    if (isAuthenticated) {
-      fetchData();
+  const fetchServices = useCallback(async () => {
+    try {
+      const res = await fetch(`${API_URL}/api/services`);
+      const data = await res.json();
+      setServices(data);
+    } catch {
+      toast.error("Failed to load services");
     }
-  }, [isAuthenticated, activeTab]);
+  }, []);
 
-  const fetchData = () => {
-    if (activeTab === "services") fetchServices();
-    else if (activeTab === "bookings") fetchBookings();
-    else if (activeTab === "timeslots") fetchTimeSlots();
-    else if (activeTab === "blog") fetchPosts();
-  };
+  const fetchBookings = useCallback(async () => {
+    try {
+      const res = await fetch(`${API_URL}/api/bookings`);
+      const data = await res.json();
+      setBookings(data);
+    } catch {
+      toast.error("Failed to load bookings");
+    }
+  }, []);
+
+  const fetchTimeSlots = useCallback(async () => {
+    try {
+      const res = await fetch(`${API_URL}/api/time-slots`);
+      const data = await res.json();
+      setTimeSlots(data);
+    } catch {
+      toast.error("Failed to load time slots");
+    }
+  }, []);
+
+  const fetchPosts = useCallback(async () => {
+    try {
+      const res = await fetch(`${API_URL}/api/blog`);
+      const data = await res.json();
+      setPosts(data);
+    } catch {
+      toast.error("Failed to load posts");
+    }
+  }, []);
+
+  useEffect(() => {
+    if (!isAuthenticated) return;
+
+    let cancelled = false;
+
+    const load = async () => {
+      await Promise.resolve();
+      if (cancelled) return;
+
+      if (activeTab === "services") await fetchServices();
+      else if (activeTab === "bookings") await fetchBookings();
+      else if (activeTab === "timeslots") await fetchTimeSlots();
+      else if (activeTab === "blog") await fetchPosts();
+    };
+
+    load();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [
+    isAuthenticated,
+    activeTab,
+    fetchServices,
+    fetchBookings,
+    fetchTimeSlots,
+    fetchPosts,
+  ]);
 
   const handleLogin = () => {
     if (password === "Natasha2011") {
@@ -56,46 +148,6 @@ export default function AdminPage() {
       toast.success("Logged in successfully");
     } else {
       toast.error("Incorrect password");
-    }
-  };
-
-  const fetchServices = async () => {
-    try {
-      const res = await fetch(`${API_URL}/api/services`);
-      const data = await res.json();
-      setServices(data);
-    } catch (error) {
-      toast.error("Failed to load services");
-    }
-  };
-
-  const fetchBookings = async () => {
-    try {
-      const res = await fetch(`${API_URL}/api/bookings`);
-      const data = await res.json();
-      setBookings(data);
-    } catch (error) {
-      toast.error("Failed to load bookings");
-    }
-  };
-
-  const fetchTimeSlots = async () => {
-    try {
-      const res = await fetch(`${API_URL}/api/time-slots`);
-      const data = await res.json();
-      setTimeSlots(data);
-    } catch (error) {
-      toast.error("Failed to load time slots");
-    }
-  };
-
-  const fetchPosts = async () => {
-    try {
-      const res = await fetch(`${API_URL}/api/blog`);
-      const data = await res.json();
-      setPosts(data);
-    } catch (error) {
-      toast.error("Failed to load posts");
     }
   };
 
@@ -113,7 +165,7 @@ export default function AdminPage() {
       toast.success("Service added");
       setServiceForm({ title: "", description: "", price: "" });
       fetchServices();
-    } catch (error) {
+    } catch {
       toast.error("Failed to add service");
     }
   };
@@ -123,7 +175,7 @@ export default function AdminPage() {
       await fetch(`${API_URL}/api/services/${id}`, { method: "DELETE" });
       toast.success("Service deleted");
       fetchServices();
-    } catch (error) {
+    } catch {
       toast.error("Failed to delete service");
     }
   };
@@ -137,7 +189,7 @@ export default function AdminPage() {
       });
       toast.success(`Booking ${status}`);
       fetchBookings();
-    } catch (error) {
+    } catch {
       toast.error("Failed to update booking");
     }
   };
@@ -155,7 +207,7 @@ export default function AdminPage() {
       });
       toast.success("Time slot added");
       fetchTimeSlots();
-    } catch (error) {
+    } catch {
       toast.error("Failed to add time slot");
     }
   };
@@ -165,7 +217,7 @@ export default function AdminPage() {
       await fetch(`${API_URL}/api/time-slots/${id}`, { method: "DELETE" });
       toast.success("Time slot deleted");
       fetchTimeSlots();
-    } catch (error) {
+    } catch {
       toast.error("Failed to delete time slot");
     }
   };
@@ -187,7 +239,7 @@ export default function AdminPage() {
       setBlogForm({ title: "", description: "" });
       setBlogImage(null);
       fetchPosts();
-    } catch (error) {
+    } catch {
       toast.error("Failed to add blog post");
     }
   };
@@ -197,21 +249,22 @@ export default function AdminPage() {
       await fetch(`${API_URL}/api/blog/${id}`, { method: "DELETE" });
       toast.success("Blog post deleted");
       fetchPosts();
-    } catch (error) {
+    } catch {
       toast.error("Failed to delete blog post");
     }
   };
 
   if (!isAuthenticated) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-background">
-        <Card className="w-full max-w-md">
+      <div id="main" className="admin-login admin-shell">
+        <Card className="admin-login-card">
           <CardHeader>
-            <CardTitle>Admin Access</CardTitle>
+            <span className="label mb-1">Vista Hermosa</span>
+            <CardTitle className="text-2xl">Admin Access</CardTitle>
             <CardDescription>Enter password to access admin panel</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div>
+            <div className="field">
               <Label htmlFor="password">Password</Label>
               <Input
                 id="password"
@@ -229,28 +282,46 @@ export default function AdminPage() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      <div className="container mx-auto px-4 py-8">
-        <div className="mb-8 reveal">
-          <span className="label">Dashboard</span>
-          <h1 className="text-4xl font-bold mb-2" style={{ letterSpacing: '-0.04em' }}>
-            Admin Panel
-          </h1>
+    <div id="main" className="admin-shell">
+      <div className="container-wide py-12">
+        <div className="admin-header reveal">
+          <div>
+            <span className="label">Dashboard</span>
+            <h1 className="text-4xl font-bold mb-2" style={{ letterSpacing: '-0.04em' }}>
+              Admin Panel
+            </h1>
+          </div>
         </div>
         
-        <div className="flex gap-2 mb-6 flex-wrap">
-          <Button variant={activeTab === "services" ? "default" : "outline"} onClick={() => setActiveTab("services")}>
+        <div className="admin-tabs">
+          <button
+            type="button"
+            className={`admin-tab${activeTab === "services" ? " active" : ""}`}
+            onClick={() => setActiveTab("services")}
+          >
             Services
-          </Button>
-          <Button variant={activeTab === "bookings" ? "default" : "outline"} onClick={() => setActiveTab("bookings")}>
+          </button>
+          <button
+            type="button"
+            className={`admin-tab${activeTab === "bookings" ? " active" : ""}`}
+            onClick={() => setActiveTab("bookings")}
+          >
             Booking Monitoring
-          </Button>
-          <Button variant={activeTab === "timeslots" ? "default" : "outline"} onClick={() => setActiveTab("timeslots")}>
+          </button>
+          <button
+            type="button"
+            className={`admin-tab${activeTab === "timeslots" ? " active" : ""}`}
+            onClick={() => setActiveTab("timeslots")}
+          >
             Time Slot Configuration
-          </Button>
-          <Button variant={activeTab === "blog" ? "default" : "outline"} onClick={() => setActiveTab("blog")}>
+          </button>
+          <button
+            type="button"
+            className={`admin-tab${activeTab === "blog" ? " active" : ""}`}
+            onClick={() => setActiveTab("blog")}
+          >
             Blog Post Editing
-          </Button>
+          </button>
         </div>
 
         {/* Services Tab */}
@@ -283,7 +354,7 @@ export default function AdminPage() {
               </CardHeader>
               <CardContent className="space-y-2">
                 {services.map((service) => (
-                  <div key={service.id} className="flex justify-between items-center p-4 border rounded-lg">
+                  <div key={service.id} className="admin-row">
                     <div>
                       <h3 className="font-semibold">{service.title}</h3>
                       <p className="text-sm text-gray-600">{service.description}</p>
@@ -305,7 +376,7 @@ export default function AdminPage() {
             </CardHeader>
             <CardContent className="space-y-4">
               {bookings.map((booking) => (
-                <div key={booking.id} className="p-4 border rounded-lg space-y-2">
+                <div key={booking.id} className="p-5 border border-line rounded-2xl bg-white/70 space-y-2">
                   <div className="flex justify-between">
                     <h3 className="font-semibold text-lg">{booking.services?.title}</h3>
                     <span className={`px-2 py-1 rounded text-sm ${
@@ -340,7 +411,7 @@ export default function AdminPage() {
                 <div>
                   <Label>Type</Label>
                   <select
-                    className="w-full p-2 border rounded-md"
+                    className="w-full h-10 rounded-lg border border-line bg-white/70 px-3 text-sm"
                     value={timeSlotForm.type}
                     onChange={(e) => setTimeSlotForm({...timeSlotForm, type: e.target.value})}
                   >
@@ -353,7 +424,7 @@ export default function AdminPage() {
                   <div>
                     <Label>Day of Week</Label>
                     <select
-                      className="w-full p-2 border rounded-md"
+                      className="w-full h-10 rounded-lg border border-line bg-white/70 px-3 text-sm"
                       value={timeSlotForm.day_of_week}
                       onChange={(e) => setTimeSlotForm({...timeSlotForm, day_of_week: e.target.value})}
                     >
@@ -401,7 +472,7 @@ export default function AdminPage() {
                 <div>
                   <Label>Action</Label>
                   <select
-                    className="w-full p-2 border rounded-md"
+                    className="w-full h-10 rounded-lg border border-line bg-white/70 px-3 text-sm"
                     value={timeSlotForm.action}
                     onChange={(e) => setTimeSlotForm({...timeSlotForm, action: e.target.value})}
                   >
@@ -420,10 +491,10 @@ export default function AdminPage() {
               </CardHeader>
               <CardContent className="space-y-2">
                 {timeSlots.map((slot) => (
-                  <div key={slot.id} className="flex justify-between items-center p-3 border rounded-lg">
+                  <div key={slot.id} className="admin-row">
                     <div>
                       <p className="font-semibold">
-                        {slot.type === 'recurring' ? `Recurring - ${['Sun','Mon','Tue','Wed','Thu','Fri','Sat'][slot.day_of_week]}` : `Date: ${slot.specific_date}`}
+                        {slot.type === 'recurring' ? `Recurring - ${['Sun','Mon','Tue','Wed','Thu','Fri','Sat'][slot.day_of_week ?? 0]}` : `Date: ${slot.specific_date}`}
                       </p>
                       <p className="text-sm text-gray-600">{slot.start_time} - {slot.end_time} | Action: {slot.action}</p>
                     </div>
@@ -465,7 +536,7 @@ export default function AdminPage() {
               </CardHeader>
               <CardContent className="space-y-2">
                 {posts.map((post) => (
-                  <div key={post.id} className="flex justify-between items-start p-4 border rounded-lg">
+                  <div key={post.id} className="admin-row items-start">
                     <div className="flex-1">
                       <h3 className="font-semibold text-lg">{post.title}</h3>
                       <p className="text-sm text-gray-600 mb-2">{new Date(post.created_at).toLocaleDateString()}</p>
